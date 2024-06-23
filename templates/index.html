@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIverson Bets</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Cover Page -->
+    <div id="cover-page">
+        <div class="cover-content">
+            <h1>AIverson Bets</h1>
+            <p>Your ultimate NBA player performance predictor</p>
+            <button onclick="scrollToForm()">Get Started</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="container">
+        <header>
+            <h1>Make Your Prediction</h1>
+        </header>
+        <form id="prediction-form" method="post" action="/predict">
+            <label for="player_id">Player:</label>
+            <select id="player_id" name="player_id" required>
+                <option value="" disabled selected>Select a player</option>
+                {% for player in players %}
+                    <option value="{{ player['Player ID'] }}">{{ player['Player Name'] }}</option>
+                {% endfor %}
+            </select>
+            <label for="team">Opponent Team:</label>
+            <select id="team" name="team" required>
+                <option value="" disabled selected>Select an opponent team</option>
+                {% for team in teams %}
+                    <option value="{{ team }}">{{ team_names[team] }}</option>
+                {% endfor %}
+            </select>
+            <label for="last_n_games">Number of games for prediction:</label>
+            <input type="range" id="last_n_games" name="last_n_games" min="1" max="10" value="5" class="slider" oninput="this.nextElementSibling.value = this.value">
+            <output>5</output>
+            <button type="submit">Predict</button>
+        </form>
+        <div class="prediction" id="prediction-result">
+            <!-- Prediction result will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        function scrollToForm() {
+            document.getElementById('main-content').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            }).then(response => response.text()).then(html => {
+                document.getElementById('prediction-result').innerHTML = html;
+            }).catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
